@@ -3,7 +3,16 @@ var register = function(Handlebars) {
     isA: function(user, options) {
         if(user !== undefined)
         {
-            return user.isAdmin;
+            if(user.role === "Admin") return true;
+            if(user.role === "Manager") return true;
+        }
+        return false;
+    },
+    isM: function(user, options) {
+        if(user !== undefined)
+        {
+            //console.log(user);
+            if(user.role === "Manager") return true;
         }
         return false;
     },

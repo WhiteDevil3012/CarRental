@@ -23,6 +23,11 @@
         <li class="nav-item">
           <a class="nav-link" href="/profile">Profile</a>
         </li>
+        {{#if (isM user)}}
+        <li class="nav-item">
+          <a class="nav-link" href="/createA">Create an admin</a>
+        </li>
+        {{/if}}
         <li class="nav-item">
           <a class="nav-link" href="/showCars">Show Cars</a>
         </li>

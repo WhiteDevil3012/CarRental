@@ -25,7 +25,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 //Load Helpers
-const {requireLogin,ensureGuest,checkAdmin} = require('./helpers/authHelper');
+const {requireLogin,ensureGuest,checkAdmin,checkM} = require('./helpers/authHelper');
 const {upload} = require('./helpers/aws');
 //Require Passports
 require('./passport/local');
@@ -123,6 +123,9 @@ app.post('/signup',ensureGuest,(req,res)=>{
                 //Encrypt Password
                 let salt = bcrypt.genSaltSync(10);
                 let hash = bcrypt.hashSync(req.body.password,salt);
+                let img="/image/defaultuser.png";
+                if(req.body.image!=="")
+                    img=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
                 
                 const newUser = {
                     name:req.body.name,
@@ -131,7 +134,8 @@ app.post('/signup',ensureGuest,(req,res)=>{
                     location:req.body.location,
                     drive:req.body.drive,
                     password: hash,
-                    image:`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`,
+                    image:img,
+                    role:"User",
                 }
                 new User(newUser).save((err,user) => {
                     if(err){
@@ -166,20 +170,9 @@ app.get('/profile',requireLogin,(req,res) => {
                 throw err;
             }
             if(user){
-                user1={
-                    _id:user._id,
-                    name:user.name,
-                    email:user.email,
-                    image:user.image,
-                    phone:user.phone,
-                    location:user.location,
-                    password:user.password,
-                    online:true,
-                    isAdmin:user.isAdmin,
-                };
                 res.render('profile',{
                     title:'Profile',
-                    user:user1
+                    user:user,
                 });
             }
         })
@@ -211,6 +204,11 @@ app.get('/logout',requireLogin,(req,res) => {
 app.get('/listcar',requireLogin,checkAdmin,(req,res) => {
     res.render('listcar',{
         title:'List a car',
+    })
+});
+app.get('/createA',requireLogin,checkM,(req,res) => {
+    res.render('addadmin',{
+        title:'Add admin',
     })
 });
 app.post('/tariff',requireLogin,checkAdmin,(req,res) => {
@@ -300,7 +298,70 @@ app.get('/showCars',requireLogin,(req,res) => {
         })
     })
     
-} )
+} );
+app.post('/createA',requireLogin,checkM,(req,res)=>{
+    console.log(req.body);
+    let errors=[];
+    if(req.body.password !== req.body.password2) {
+        errors.push({text: 'Passwords do not match!'});
+    }
+    if(req.body.password.length < 6 ) {
+        errors.push({text: 'Password must be atleast 6 characters!'});
+    }
+    console.log(errors);
+    if(errors.length > 0)
+    {
+        res.render('addadmin',{
+            title:'Add admin',
+            errors:errors,
+            name:req.body.name,
+            email:req.body.email,
+            phone:req.body.phone,
+            location:req.body.location,
+            drive:req.body.drive,
+        });
+    }else{
+        User.findOne({email:req.body.email})
+        .then((user) => {
+            if(user){
+                let errors = [];
+                errors.push({text:"Email already exists"});
+                res.render('signup',{
+                    errors:errors,
+                });
+            }else{
+                //Encrypt Password
+                let salt = bcrypt.genSaltSync(10);
+                let hash = bcrypt.hashSync(req.body.password,salt);
+                let img="/image/defaultuser.png";
+                if(req.body.image!=="")
+                    img=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
+                const newUser = {
+                    name:req.body.name,
+                    email:req.body.email,
+                    phone:req.body.phone,
+                    location:req.body.location,
+                    drive:req.body.drive,
+                    password: hash,
+                    role: "Admin",
+                    image: img,
+                }
+                new User(newUser).save((err,user) => {
+                    if(err){
+                        throw err;
+                    }
+                    if(user){
+                        console.log('New Admin is created');
+                        res.render('profile',{
+                            title:'Profile',
+                        });
+                    }
+                })
+            }
+            
+        })
+    }
+});
 app.post('/uploadImage',upload.any(),(req,res) => {
     const form = new formidable.IncomingForm();
     form.on('file',(field,file) => {

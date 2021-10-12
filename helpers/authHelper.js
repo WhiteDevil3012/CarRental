@@ -15,7 +15,14 @@ module.exports = {
         }
     },
     checkAdmin:(req,res,next) => {
-        if(req.user.isAdmin) {
+        if(req.user.role !== "User") {
+            return next();
+        }else {
+            res.redirect('/');
+        }
+    },
+    checkM:(req,res,next) => {
+        if(req.user.role === "Manager" ) {
             return next();
         }else {
             res.redirect('/');
