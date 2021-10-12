@@ -1,0 +1,18 @@
+{{#each cars}}
+<img src="{{image}}" width="300px">
+<p>Car Make:{{make}}</p>
+<p>Car Model:{{model}}</p>
+<p>Manufacture Year:{{year}}</p>
+<p>Car Type:{{type}}</p>
+<p>Location:{{location}}</p>
+<p>Tariff:</p>
+<p>Base Price:{{tariff.bp}}</p>
+<p>Price per hour:{{tariff.pph}}</p>
+<p>Price per day:{{tariff.ppd}}</p>
+<form action='/dispcar' method="POST">
+    <input type="hidden" name="cid" value="{{_id}}"/>
+    <button>Display Car</button>
+</form>
+{{else}}
+<p> No cars found</p>
+{{/each}}
