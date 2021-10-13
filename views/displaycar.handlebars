@@ -8,3 +8,8 @@
 <p>Base Price:{{car.tariff.bp}}</p>
 <p>Price per hour:{{car.tariff.pph}}</p>
 <p>Price per day:{{car.tariff.ppd}}</p>
+<form class="login-form" method="POST" action="/rentcar">
+          <input type="hidden" name="cid" id="cid" value="{{car._id}}"/>
+          <input type="hidden" name="uid" id="uid" value="{{user._id}}"/>
+          <button>Rent Now</button>
+        </form>

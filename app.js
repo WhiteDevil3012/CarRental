@@ -42,6 +42,7 @@ const user = require('./models/user');
 const Car = require('./models/car');
 const Tariff = require('./models/tariff');
 const tariff = require('./models/tariff');
+const Book = require('./models/booking');
 //Connect
 mongoose.connect(keys.MongoDB,{
     useNewUrlParser: true, 
@@ -361,6 +362,50 @@ app.post('/createA',requireLogin,checkM,(req,res)=>{
             
         })
     }
+});
+app.post('/rentcar',requireLogin,(req,res)=> {
+    console.log(req.body);
+    Book.findOne({user:req.body.uid,hasCompleted:false})
+    .then((book)=> {
+        if(!book){
+            newBook={
+                user:req.body.uid,
+                car:req.body.cid,
+            }
+            new Book(newBook).save((err,book) => {
+                if(err){
+                    throw err;
+                }
+                if(book){
+                    console.log('New Booking is done');
+                    Car.findById({_id:req.body.cid})
+                    .then((car) => {
+                        car.isAvailable=false,
+                        car.save((err,car) => {
+                            if(err){
+                                throw err;
+                            }
+                            if (car){
+                                res.render('profile',{
+                                    title:'Profile',
+                                });
+                            }
+                        });
+                    });
+                }
+            })
+        }
+        if(book){
+            console.log("User has booked");
+            let errors=[];
+            errors.push({text:"You have already booked"});
+            res.render('profile',{
+                title:'Error',
+                errors:errors,
+            });
+        }
+    });
+    
 });
 app.post('/uploadImage',upload.any(),(req,res) => {
     const form = new formidable.IncomingForm();
