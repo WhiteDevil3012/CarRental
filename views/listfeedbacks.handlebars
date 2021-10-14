@@ -1,0 +1,11 @@
+{{#each feedbacks}}
+<img src="{{image}}" width="300px">
+<p>Rating:{{rating}}</p>
+<p>Car Model:{{book.car.model}}</p>
+<p>Car Type:{{book.car.type}}</p>
+<p>Returned on:{{book.end}}</p>
+<p>Review:{{review}}</p>
+<hr>
+{{else}}
+<p> No feedback found</p>
+{{/each}}

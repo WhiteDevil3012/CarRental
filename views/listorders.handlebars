@@ -1,0 +1,20 @@
+{{#each books}}
+<hr>
+<p>Booking ID:{{_id}}</p>
+<p>User:{{user}}</p>
+<img src="{{car.image}}" width="300px">
+<p>Staring Date:{{start}}</p>
+<p>car name{{car.model}}</p>
+<p>Car Type:{{car.type}}</p>
+{{#if hasCompleted}}
+<p>Ending Date:{{end}}</p>
+{{else}}
+    {{#if end}}
+        <p>Payment Pending</p>
+    {{else}}
+    <p>Still Not yet returned</p>
+    {{/if}}
+{{/if}}
+{{else}}
+<p> No orders done</p>
+{{/each}}

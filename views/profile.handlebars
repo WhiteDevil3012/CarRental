@@ -1,3 +1,8 @@
+{{#each success}}      
+      <div class="alert alert-success alert-dismissible fade show">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{text}}
+      </div>
+      {{/each}}
 {{#each errors}}
       <div class="alert alert-danger">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{text}}
@@ -11,6 +16,9 @@
             <p>{{user.email}}</p>
             <p>{{user.phone}}</p>
             <p>{{user.location}}</p>
+            <form class="login-form" method="POST" action="/dispOrders">
+            <button><My Orders></button>
+            </form>
         </div>
     </div>
 </div>

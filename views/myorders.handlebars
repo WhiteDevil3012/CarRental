@@ -1,0 +1,25 @@
+{{#each books}}
+<hr>
+<p>Booking ID:{{_id}}</p>
+<img src="{{car.image}}" width="300px">
+<p>Staring Date:{{start}}</p>
+<p>car name{{car.model}}</p>
+<p>Car Type:{{car.type}}</p>
+{{#if hasCompleted}}
+<p>Ending Date:{{end}}</p>
+{{else}}
+    {{#if end}}
+    <form action='/makePayment' method="GET">
+        <input type="hidden" name="bid" value="{{_id}}"/>
+        <button>Pay Now</button>
+    </form>
+    {{else}}
+    <form action='/return' method="POST">
+        <input type="hidden" name="bid" value="{{_id}}"/>
+        <button>Return Car</button>
+    </form>
+    {{/if}}
+{{/if}}
+{{else}}
+<p> No orders done</p>
+{{/each}}

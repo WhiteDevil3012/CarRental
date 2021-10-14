@@ -36,13 +36,16 @@ app.use((req,res,next) => {
 })
 //Load Files
 const keys = require('./config/keys');
+//Load Stripe
+const stripe = require('stripe')(keys.StripeSecretKey);
 //Load Collections
 const User = require('./models/user');
-const user = require('./models/user');
 const Car = require('./models/car');
 const Tariff = require('./models/tariff');
-const tariff = require('./models/tariff');
 const Book = require('./models/booking');
+const Pay = require('./models/payments');
+const Feedback = require('./models/feedback');
+const feedback = require('./models/feedback');
 //Connect
 mongoose.connect(keys.MongoDB,{
     useNewUrlParser: true, 
@@ -420,6 +423,221 @@ app.post('/uploadImage',upload.any(),(req,res) => {
     });
     form.parse(req);
 });
+app.post('/dispOrders',requireLogin,(req,res) => {
+    Book.find({user:req.user._id})
+    .populate('car')
+    .sort({end:'desc'})
+    .then((books) => {
+        res.render('myorders', {
+            books: books,
+            title :"Your Orders",
+        })
+    })
+});
+function msToTime(duration) {
+    const msInWeek = 1000 * 60 * 60 * 24 *7;
+    const weeks = Math.trunc(duration / msInWeek);
+    duration = duration - (weeks * msInWeek);
+    const msInDay = 1000 * 60 * 60 * 24;
+    const days = Math.trunc(duration / msInDay);
+    duration = duration - (days * msInDay);
+    const msInHour = 1000 * 60 * 60;
+    let hours = Math.trunc(duration / msInHour);
+    duration = duration - (hours * msInHour);
+    if(duration > 60*1000*30)
+        hours+=1;
+    time={
+        weeks: weeks,
+        days: days,
+        hours: hours,
+    };
+    return time;
+}
+app.post('/return',requireLogin,(req,res) => {
+    Book.findById({_id:req.body.bid})
+    .then((book) =>{
+        if(book){
+            //book.hasCompleted = true;
+            book.end=Date.now();
+            console.log(msToTime(book.end-book.start));
+            book.save((err,book) => {
+                if(err){
+                    throw err;
+                }
+                if (book){
+                    Car.findById({_id:book.car})
+                    .then((car) => {
+                        car.isAvailable = true;
+                        car.save((err,user) => {
+                            if(err){
+                                throw err;
+                            }
+                            if (car){
+                                res.redirect('/makePayment');
+                            }
+                        });
+                    })
+                }
+            });
+        }
+    })
+})
+app.get('/makePayment',requireLogin,(req,res) => {
+    Book.findOne({user:req.user._id,hasCompleted:false})
+    .populate({
+        path: "car",
+        populate : {
+            path:"tariff",
+        }
+    })
+    .then((book) => {
+        pay=msToTime(book.end-book.start);
+        //console.log(book);
+        //console.log(pay);
+        const amount=pay.hours*book.car.tariff.pph+pay.days*book.car.tariff.ppd+pay.weeks*book.car.tariff.ppw+book.car.tariff.bp;
+        console.log(amount);
+        res.render('pay',{
+            amount:amount,
+            book:book,
+            StripePublishKey:keys.StripePublishKey,
+
+        })
+    })
+});
+app.post('/pay',(req,res) =>{
+    stripe.customers.create({
+        email: req.body.stripeEmail,
+        source: req.body.stripeToken,
+    })
+    .then((customer) => {
+        stripe.charges.create({
+            amount:req.body.amount*100,
+            description:`${req.body.amount} for Booking #${req.body.id}`,
+            currency: 'inr',
+            customer: customer.id,
+            receipt_email:customer.email,
+        },(err,charge) => {
+            if(err){
+                console.log(err);
+                console.log("Enter details properly");
+            }
+            if(charge){
+                newPay={
+                    book:req.body.bid,
+                    amount:req.body.amount,
+                }
+                new Pay(newPay).save((err,pay)=>{
+                    if(pay){
+                        console.log("Payment added successfully");
+                        //console.log(pay);
+                    }
+                    if(err){
+                        console.log(err);
+                    }
+                });
+                Book.findById({_id:req.body.bid})
+                .then((book)=>{
+                    book.hasCompleted=true;
+                    book.save((err,book) =>{
+                        if(err){
+                            console.log(err);
+                        }
+                        if(book){
+                            res.render('feedback',{
+                                bid:book._id,
+                            })
+                        }
+                    })                    
+                })
+            }
+        })
+    }).catch((err) => {console.log(err);})
+})
+app.post('/feedback',(req,res) => {
+    let img=''
+    if(req.body.image!=='')
+        img=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
+    newFeedback ={
+        book:req.body.bid,
+        rating: parseInt(req.body.rating),
+        review: req.body.review,
+        image:img,
+    };
+    new Feedback(newFeedback).save((err,feed) =>{
+        if(err){
+            console.log(err);
+        }
+        if(feed){
+            console.log(feed);
+            let r=0,rl=0;
+            Book.findById({_id:feed.book})
+            .then((book) =>{
+                Feedback.find()
+                .populate('book')
+                .then((feedback) => {
+                for(let i=0;i<feedback.length;i++){
+                    //console.log(feedback[i].book.car);
+                    //console.log(book.car);
+                    if(JSON.stringify(feedback[i].book.car) === JSON.stringify(book.car)){
+                        //console.log("Equal");
+                        r+=feedback[i].rating;
+                        rl++;
+                    }
+                }
+                r=r/rl;
+                //console.log(r);
+                Car.findById({_id:book.car})
+                .then((car) =>{
+                    if(car){
+                        car.rating=r;
+                        car.save((err,car) => {
+                            if(err){
+                                console.log(err);
+                            }
+                            if(car){
+                                console.log(car.rating);
+                                console.log('Feedback stored');
+                                let success=[];
+                                success.push({text:"Booking complete. You can rent now"});
+                                res.render('profile',{
+                                    title:'Profile',
+                                    success:success,
+                                });
+                            }
+                        })
+                    }
+                })  
+            })
+            })
+        }
+    })
+})
+app.get('/viewf',(req,res)=>{
+    Feedback.find()
+    .populate({
+        path: "book",
+        populate : {
+            path:"car",
+        }
+    })
+    .then((feedbacks) =>{
+        res.render('listfeedbacks',{
+            feedbacks:feedbacks,
+            title:'Feedbacks'
+        })
+    })
+})
+app.get('/viewo',(req,res)=>{
+    Book.find()
+    .populate('car')
+    .then((books) =>{
+        res.render('listorders',{
+            books:books,
+            title:'Orders'
+        })
+    })
+})
+
 app.listen(port,() => {
     console.log('Server is on port:' + port);
 });
