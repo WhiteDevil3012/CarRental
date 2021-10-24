@@ -1,21 +1,48 @@
-<p>Booking ID:{{book._id}}</p>
-<img src="{{book.car.image}}" width="300px">
-<p>Staring Date:{{book.start}}</p>
-<p>car name{{book.car.model}}</p>
-<p>Car Type:{{book.car.type}}</p>
-<p>Ending Date:{{book.end}}</p>
-<p>Amount:{{amount}}</p>
-<form action='/pay' method="POST">
-    <input type="hidden" name="bid" value="{{book._id}}"/>
-    <input type="hidden" name="amount" value="{{amount}}"/>
-    <script 
-    src="https://checkout.stripe.com/checkout.js" 
-    data-key="{{StripePublishKey}}" 
-    class="stripe-button" 
-    data-amount="{{amount}}" 
-    data-name="Vehicle Rental"
-    data-description="${{amount}} for booking id {{book._id}}"
-    data-image="/image/logo.png",
-    >
-    </script>
-</form>
+<div
+  class="d-flex shadow-4 flex-wrap"
+  style="background-color:white;margin-top:30px;margin-bottom:100px;margin-left:3%;margin-right:3%;"
+>
+  <div
+    class="p-2 shadow-4 flex-fill"
+    style="background-color:white;width:500px;"
+  >
+    <h3 style="margin-top: 30px;margin-left:20px;">Payment</h3>
+
+    <ul class="list-group-flush" style="margin-left:20px;width:400px;">
+      <li class="list-group-item" style="margin-left:0px;">Booking ID:
+        {{book._id}}</li>
+      <li class="list-group-item" style="margin-left:0px;">Car Type:
+        {{book.car.type}}</li>
+      <li class="list-group-item" style="margin-left:0px;">Start Date:
+        {{book.start}}</li>
+
+      <li class="list-group-item" style="margin-left:0px;">Ending Date:
+        {{book.end}}</li>
+
+    </ul>
+
+    <h4 style="margin-top: 30px;margin-left:20px;">Amount: {{amount}}</h4>
+    <form action="/pay" method="POST" style="margin-left:20px;margin-top:20px;">
+      <input type="hidden" name="bid" value="{{book._id}}" />
+      <input type="hidden" name="amount" value="{{amount}}" />
+      <script
+        src="https://checkout.stripe.com/checkout.js"
+        data-key="{{StripePublishKey}}"
+        class="stripe-button"
+        data-amount="{{amount}}"
+        data-name="Vehicle Rental"
+        data-description="${{amount}} for booking id {{book._id}}"
+        data-image="/image/logo.png"
+        ,
+      >
+      </script>
+    </form>
+  </div>
+  <div
+    class="p-2 d-flex shadow-4 flex-fill bg-image hover-zoom"
+    style="background-color: white;width:500px;min-width:50%;"
+  >
+    <img src="{{book.car.image}}" class="img-fluid ms-auto me-auto" />
+  </div>
+
+</div>

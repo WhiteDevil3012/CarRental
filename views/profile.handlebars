@@ -1,24 +1,53 @@
-{{#each success}}      
-      <div class="alert alert-success alert-dismissible fade show">
-        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{text}}
-      </div>
-      {{/each}}
+{{#each success}}
+  <div class="alert alert-success alert-dismissible fade show">
+    <span type="button" class="close" data-mdb-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>{{text}}
+  </div>
+{{/each}}
 {{#each errors}}
-      <div class="alert alert-danger">
-        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{text}}
-      </div>
-    {{/each}}
-<div class="container">
-    <div class="row">
-        <div class="col-sm-4">
-            <img src="{{user.image}}" width="64px" height="64px">
-            <p>{{user.name}}</p>
-            <p>{{user.email}}</p>
-            <p>{{user.phone}}</p>
-            <p>{{user.location}}</p>
-            <form class="login-form" method="POST" action="/dispOrders">
-            <button><My Orders></button>
-            </form>
-        </div>
-    </div>
+  <div class="alert alert-danger alert-dismissible fade show">
+    <span type="button" class="close" data-mdb-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>{{text}}
+  </div>
+{{/each}}
+
+<div class="card shadow-4 ms-auto me-auto" style="width:300px;min-width:300px;">
+  <img
+    src="{{user.image}}"
+    class="card-img-top ms-auto me-auto"
+    alt="..."
+    style="height:150px;width:150px;margin-top:30px;"
+  />
+  <div class="card-body">
+
+    <ul
+      class="list-group list-group-flush ms-auto me-auto"
+      style="margin-top:30px;"
+    >
+      <li class="list-group-item" style="margin-left:0px;">{{user.firstname}}
+        {{user.lastname}}</li>
+      <li class="list-group-item" style="margin-left:0px;">{{user.phone}}</li>
+      <li
+        class="list-group-item"
+        style="margin-left:0px;"
+      >{{user.location}}</li>
+    </ul>
+    
+  </div>
 </div>
+{{#if (isU user)}}
+    <!--
+    <form
+      class="login-form"
+      method="POST"
+      action="/dispOrders"
+      style="height:100px;"
+    >
+      <button
+        type="submit"
+        class="btn btn-primary btn me-auto ms-auto"
+        style="margin-top: 20px;width:100px;"
+      >My Orders</button>
+    </form> -->
+    <br><br><hr>
+    <h1>My Orders:</h1>
+    {{> myorders}}
+    {{/if}}

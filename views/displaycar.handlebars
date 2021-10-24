@@ -1,15 +1,64 @@
-<img src="{{car.image}}" width="300px">
-<p>Car Make:{{car.make}}</p>
-<p>Car Model:{{car.model}}</p>
-<p>Manufacture Year:{{car.year}}</p>
-<p>Car Type:{{car.type}}</p>
-<p>Location:{{car.location}}</p>
-<p>Tariff:</p>
-<p>Base Price:{{car.tariff.bp}}</p>
-<p>Price per hour:{{car.tariff.pph}}</p>
-<p>Price per day:{{car.tariff.ppd}}</p>
-<form class="login-form" method="POST" action="/rentcar">
-          <input type="hidden" name="cid" id="cid" value="{{car._id}}"/>
-          <input type="hidden" name="uid" id="uid" value="{{user._id}}"/>
-          <button>Rent Now</button>
-        </form>
+<div class="d-flex flex-row mb-3 flex-wrap shadow-4" style="margin-top:3%;">
+  <div
+    class="p-2 shadow-4 flex-fill"
+    style="background-color:white;min-width:50%;"
+  >
+    <h3 style="margin-top: 30px;margin-left:20px;">{{car.make}}
+      {{car.model}}</h3>
+    <ul class="list-group-flush" style="margin-left:20px;width:400px;">
+      <li class="list-group-item" style="margin-left:0px;">Manufacture Year:
+        {{car.year}}</li>
+      <li class="list-group-item" style="margin-left:0px;">Car Type:
+        {{car.type}}</li>
+      <li class="list-group-item" style="margin-left:0px;">Location:
+        {{car.location}}</li>
+    </ul>
+    <h4
+      style="margin-top: 30px;margin-left:20px;margin-bottom:20px;"
+    >Tariff:</h4>
+    <ul class="list-group">
+      <ul class="list-group list-group-horizontal">
+        <li class="list-group-item" style="width:150px;">Base Price</li>
+        <li
+          class="list-group-item"
+          style="margin-left:0px;width:100px;"
+        >{{car.tariff.bp}}</li>
+      </ul>
+      <ul class="list-group list-group-horizontal">
+        <li class="list-group-item" style="width:150px;">Price per hour</li>
+        <li
+          class="list-group-item"
+          style="margin-left:0px;width:100px;"
+        >{{car.tariff.pph}}</li>
+      </ul>
+      <ul class="list-group list-group-horizontal">
+        <li class="list-group-item" style="width:150px;">Price per day</li>
+        <li
+          class="list-group-item"
+          style="margin-left:0px;width:100px;"
+        >{{car.tariff.ppd}}</li>
+      </ul>
+    </ul>
+    <form
+      class="pt-2 login-form"
+      method="POST"
+      action="/rentcar"
+      style="margin-top: 20px;"
+    >
+      <input type="hidden" name="cid" id="cid" value="{{car._id}}" />
+      <input type="hidden" name="uid" id="uid" value="{{user._id}}" />
+      <button
+        type="submit"
+        class="btn btn-primary btn"
+        style="margin-left: 50px;"
+      >Rent Now</button>
+    </form>
+  </div>
+  <div
+    class="p-2 d-flex shadow-4 flex-fill bg-image hover-zoom"
+    style="background-color: white;width:500px;min-width:50%;"
+  >
+    <img class="img-fluid ms-auto me-auto" src="{{car.image}}" />
+  </div>
+</div>
+{{> feedbacks}}

@@ -16,6 +16,14 @@ var register = function(Handlebars) {
         }
         return false;
     },
+    isU: function(user, options) {
+        if(user !== undefined)
+        {
+            //console.log(user);
+            if(user.role === "User") return true;
+        }
+        return false;
+    },
     
 };
 

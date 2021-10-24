@@ -3,15 +3,11 @@
   style="background-color:white;margin-top:30px;margin-bottom:100px;margin-left:3%;margin-right:3%;"
 >
 <div class="table-responsive me-auto ms-auto">
-{{#if feedbacks}}
 <table class="table table-hover">
     <thead>
       <tr>
         <th scope="col">Image</th>
         <th scope="col">Rating</th>
-        <th scope="col">Car Model</th>
-        <th scope="col">Car Type</th>
-        <th scope="col">Returned on</th>
         <th scope="col">Review</th>
       </tr>
     </thead>
@@ -26,9 +22,6 @@
             {{/if}}
             </td>
           <td>{{rating}}</th>
-          <td>{{book.car.model}}</td>
-          <td>{{book.car.type}}</td>
-          <td>{{book.end}}</td>
           <td>{{review}}</td>
         </tr>
     
@@ -38,7 +31,6 @@
   {{/each}}
 </tbody>
 </table>
-{{/if}}
 </div>
 </div>
 

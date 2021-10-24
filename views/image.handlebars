@@ -1,36 +1,59 @@
-<style>
-  body {
-  background-color: #328f8a;
-  background-image: linear-gradient(45deg, #328f8a, #08ac4b);
-  font-family: "Roboto", sans-serif;
-}
-</style>
-<div class="body">
-    
-<div class="login-page">
-      <div class="form">
-        <div class="login">
-          <div class="login-header">
-            <h3>List your car</h3>
-          </div>
-        </div>
-        <form class="login-form" method="POST" action="/uploadcar">
-          <input type="hidden" name="cid" id="cid" value="{{cid}}"/>
-          <input type="file" name="image" id="upload-ip" style="display:none"/>
-          <buttom class="btn btn-info upload-btn" type="button">Choose an image</buttom>
-          <button>Submit</button>
+<form
+          class="d-flex ms-auto me-auto flex-column"
+          style="width:50%;min-width:300px;0%;margin-top:50px;"
+          action="/backtotariff"
+          method="POST"
+        >
+        <input type="hidden" name="cid" id="cid" value="{{cid}}" />
+        <input type="hidden" name="tid" id="tid" value="{{tid}}" />
+<button
+            type="submit"
+            class="btn btn-primary btn me-auto ms-auto"
+            style="margin-top: 20px;width:100px;margin-bottom:60px;"
+          ><i class="fas fa-arrow-left"></i></button>
         </form>
-      </div>
-    </div>
+<div
+  class="container shadow-4"
+  style="background-color: white;margin-bottom:100px;"
+>
+  <div class="d-flex" style="margin-top: 50px;justify-content: center;"><h3
+      style="margin-top: 30px;"
+    >List you car</h3></div>
+  <form
+    action="/uploadcar"
+    method="post"
+    class="d-flex flex-column me-auto ms-auto"
+    style="width:60%;min-width:300px;margin-top:50px;"
+  >
+    <input type="hidden" name="cid" id="cid" value="{{cid}}" />
+    <input type="hidden" name="tid" id="tid" value="{{tid}}" />
+    <label
+      class="form-label"
+      for="customFile"
+      style="margin-left:10px"
+    >Image</label>
+    <input
+      type="file"
+      class="form-control"
+      id="customFile"
+      name="image"
+      value="{{image}}"
+      style="width:50%;margin-left:10px;margin-right:10px;min-width:210px;"
+    /> 
+    <!-- Submit button -->
+    <button
+      type="submit"
+      class="p-1 btn btn-primary btn-block mb-4 ms-auto me-auto"
+      style="width:80px;margin-top:40px;"
+    ><i class="fas fa-arrow-right"></i></button>
+  </form>
 </div>
 <script type="text/javascript">
 //Jquery
 $(document).ready(function(){
-    $('.upload-btn').on('click',function(){
-        $('#upload-ip').click();
-    });
-    $('#upload-ip').on('change',function(){
-        var uploadip = $('#upload-ip');
+    
+    $('#customFile').on('change',function(){
+        var uploadip = $('#customFile');
         if(uploadip.val() != ''){
             var formData = new FormData();
             formData.append('image',uploadip[0].files[0]);

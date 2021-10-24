@@ -1,48 +1,216 @@
-<style>
-  body {
-  background-color: #328f8a;
-  background-image: linear-gradient(45deg, #328f8a, #08ac4b);
-  font-family: "Roboto", sans-serif;
-}
-</style>
-<div class="body">
-<div class="login-page">
-    {{#each errors}}
-      <div class="alert alert-danger">
-        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{text}}
+<div
+  class="container shadow-4 ms-auto me-auto"
+  style="background-color: white;margin:0px;min-width:100%;"
+>
+  <div>
+    <!-- Tabs navs -->
+    <ul
+      class="nav flex-nowrap nav-tabs mb-3 justify-content-center"
+      id="ex1"
+      role="tablist"
+      style="margin-left:50px;margin-right:50px;margin-top:100px;"
+    >
+      <li
+        class="nav-item"
+        role="presentation"
+        style="text-align:center;width:50%;min-width:150px;"
+      >
+        <a
+          class="nav-link"
+          id="ex1-tab-1"
+          data-mdb-toggle="tab"
+          href="#ex1-tabs-1"
+          role="tab"
+          aria-controls="ex1-tabs-1"
+          aria-selected="true"
+          style="font-size:larger;"
+        >Login</a>
+      </li>
+      <li
+        class="nav-item"
+        role="presentation"
+        style="width:50%;min-width:150px;text-align:center"
+      >
+        <a
+          class="nav-link active"
+          id="ex1-tab-2"
+          data-mdb-toggle="tab"
+          href="#ex1-tabs-2"
+          role="tab"
+          aria-controls="ex1-tabs-2"
+          aria-selected="false"
+          style="font-size:larger"
+        >Sign up</a>
+      </li>
+    </ul>
+    <!-- Tabs navs -->
+    <!-- Tabs content -->
+    <div class="tab-content" id="ex1-content" >
+      <div
+        class="tab-pane fade"
+        id="ex1-tabs-1"
+        role="tabpanel"
+        aria-labelledby="ex1-tab-1"
+      >
+      {{#each success}}
+        
+      <div class="alert alert-success alert-dismissible fade show">
+        <span type="button" class="close" data-mdb-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>{{text}}
+      </div>
+      {{/each}}
+      {{#each errors}}
+      <div class="alert alert-danger alert-dismissible fade show">
+        <span type="button" class="close" data-mdb-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>{{text}}
       </div>
     {{/each}}
-      <div class="form">
-        <div class="login">
-          <div class="login-header">
-            <h3>SignUp</h3>
-            <p>Create your own account</p>
+        <form
+          class="d-flex ms-auto me-auto flex-column"
+          style="width:50%;min-width:300px;0%;margin-top:50px;"
+          action="/loginform"
+          method="POST"
+        >
+          <!-- Email input -->
+          <div class="p-1 form-outline">
+
+            <input
+              type="email"
+              id="form1Example1"
+              name="email"
+              value="{{email}}"
+              class="form-control form-control"
+            />
+            <label class="form-label" for="form1Example1">Email address</label>
           </div>
-        </div>
-        <form class="login-form" method="POST" action="/signup">
-          <input type="text" name="name" id="name" placeholder="Username" value="{{name}}"/>
-          <input type="email" name="email" id="email" placeholder="E-mail Address" value="{{email}}"/>
-          <input type="tel" name="phone" id="phone" pattern="[789][0-9]{9}" placeholder="Enter your mobile number without +91" value="{{phone}}"/>
-          <input type="text" name="location" id="location" placeholder="City" autocomplete="on" value="{{location}}"/>
-          <input type="text" name="drive" id="drive" placeholder="Driver's License" value="{{drive}}"/>
-          <input type="password" name="password" placeholder="Password"/>
-          <input type="password" name="password2" placeholder="ReEnter the Password"/>
-          <input type="file" name="image" id="upload-ip" style="display:none"/>
-          <buttom class="btn btn-info upload-btn" type="button">Choose an image</buttom>
-          <button>Signup</button>
-          <p class="message">Have an account? <a href="/login">Login</a></p>
+          <!-- Password input -->
+          <div class="p-1 form-outline">
+            <input
+              type="password"
+              id="form1Example2"
+              name="password"
+              value="{{password}}"
+              class="form-control form-control"
+            />
+            <label class="form-label" for="form1Example2">Password</label>
+          </div>
+          <!-- Submit button -->
+          <button
+            type="submit"
+            class="btn btn-primary btn me-auto ms-auto"
+            style="margin-top: 20px;width:100px;margin-bottom:60px;"
+          ><i class="fas fa-arrow-right"></i></button>
+        </form>
+      </div>
+      <div
+        class="tab-pane fade show active"
+        id="ex1-tabs-2"
+        role="tabpanel"
+        aria-labelledby="ex1-tab-2"
+      >
+        <form action="/signup" method="post"
+          class="d-flex flex-column me-auto ms-auto"
+          style="width:60%;min-width:300px;margin-top:50px;"
+        >
+        <!--each method for each errors-->
+        {{#each errors}}
+      <div class="alert alert-danger fade show">
+        <span type="button" class="close" data-mdb-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>{{text}}
+      </div>
+        {{/each}}
+        {{#each success}}<div class="alert alert-success fade show">
+        <span type="button" class="close" data-mdb-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>{{text}}
+      </div>
+        {{/each}}
+          <!-- 2 column grid layout with text inputs for the first and last names -->
+          <div class="p-1 d-flex flex-wrap">
+            
+              <div class="pt-1 form-outline flex-fill">
+                <input type="text" name="firstname" value="{{firstname}}" id="form6Example1" class="form-control" />
+                <label class="form-label" for="form6Example1">First name</label>
+              </div>
+            
+              <div class="pt-1 form-outline flex-fill">
+                <input type="text" name="lastname" id="form6Example2" value="{{lastname}}" class="form-control" />
+                <label class="form-label" for="form6Example2">Last name</label>
+              </div>
+          </div>
+          
+          <!-- Email input -->
+          <div class="p-1 form-outline mb-4">
+            <input type="email" id="form6Example5" name="email" class="form-control" value="{{email}}"/>
+            <label class="form-label" for="form6Example5">Email</label>
+          </div>
+
+          <!-- Password input -->
+          <div class="p-1 form-outline">
+            <input
+              type="password"
+              id="form1Example2"
+              name="password"
+              class="form-control form-control"
+            />
+            <label class="form-label" for="form1Example2">Password</label>
+          </div>
+
+          <!-- Password input -->
+          <div class="p-1 form-outline">
+            <input
+              type="password"
+              id="form1Example2"
+              name="password2"
+              class="form-control form-control"
+            />
+            <label class="form-label" for="form1Example2">Re-enter Password</label>
+          </div>
+
+          <!-- Text input -->
+          <div class="p-1 form-outline mb-4">
+            <input type="text" value="{{drive}}" name="drive" id="form6Example3" class="form-control" />
+            <label class="form-label" for="form6Example3">Drivers License No.</label>
+          </div>
+
+          <!-- Text input -->
+          <div class="p-1 form-outline mb-4">
+            <input type="text" id="form6Example4" value="{{location}}" name="location" class="form-control" />
+            <label class="form-label" for="form6Example4">City</label>
+          </div>
+
+          <!-- Number input -->
+          <div class="p-1 form-outline mb-4">
+            <input type="tel" id="form6Example6" name="phone" value="{{phone}}" class="form-control" />
+            <label class="form-label" for="form6Example6">Phone</label>
+          </div>
+
+          <label
+            class="form-label"
+            for="customFile"
+            style="margin-left:10px"
+          >Profile Picture</label>
+          <input
+            type="file"
+            class="form-control"
+            id="customFile"
+            name="image"
+            value="{{image}}"
+            style="width:50%;margin-left:10px;margin-right:10px;min-width:210px;"
+          />
+
+          <!-- Submit button -->
+          <button
+            type="submit"
+            class="p-1 btn btn-primary btn-block mb-4 ms-auto me-auto"
+            style="width:80px;margin-top:40px;"
+          ><i class="fas fa-arrow-right"></i></button>
         </form>
       </div>
     </div>
+  </div>
 </div>
 <script type="text/javascript">
 //Jquery
 $(document).ready(function(){
-    $('.upload-btn').on('click',function(){
-        $('#upload-ip').click();
-    });
-    $('#upload-ip').on('change',function(){
-        var uploadip = $('#upload-ip');
+    
+    $('#customFile').on('change',function(){
+        var uploadip = $('#customFile');
         if(uploadip.val() != ''){
             var formData = new FormData();
             formData.append('image',uploadip[0].files[0]);

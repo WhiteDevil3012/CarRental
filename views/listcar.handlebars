@@ -1,73 +1,134 @@
-<style>
-  body {
-  background-color: #328f8a;
-  background-image: linear-gradient(45deg, #328f8a, #08ac4b);
-  font-family: "Roboto", sans-serif;
-}
-</style>
-<div class="body">
-    
-<div class="login-page">
-      <div class="form">
-        <div class="login">
-          <div class="login-header">
-            <h3>List your car</h3>
-          </div>
-        </div>
-        <form class="login-form" method="POST" action="/tariff">
-          <input type="text" name="regno" id="regno" placeholder="Vehicle Registration No" value="{{regno}}"/>
-          <input type="text" name="model" id="model" placeholder="Model" value="{{model}}"/>
-          <input type="text" name="make" id="make" placeholder="Make" value="{{make}}"/>
-          <input type="number" name="year" id="year" placeholder="Year" value="{{year}}"/>
-          <select name="type" id="type">
-            <option value="Economy">Economy</option>
-            <option value="Luxury">Luxury</option>
-            <option value="SUV">SUV</option>
-          </select>
-          <input type="text" name="location" id="location" placeholder="Street,city,state" value="{{location}}"/>
-          <button>Submit</button>
-        </form>
+<div
+  class="container shadow-4"
+  style="background-color: white;margin-bottom:100px;min-width:100%"
+>
+  <div class="d-flex" style="margin-top: 50px;justify-content: center;"><h3
+      style="margin-top: 50px;"
+    >List a car</h3></div>
+  <form
+    action="/tariff"
+    method="post"
+    class="d-flex flex-column me-auto ms-auto"
+    style="width:60%;min-width:300px;margin-top:50px;"
+  >
+    <!--each method for each errors-->
+    {{#each errors}}
+      <div class="alert alert-danger">
+        {{text}}
       </div>
+    {{/each}}
+    {{#each success}}<div class="alert alert-success">
+        {{text}}
+      </div>
+    {{/each}}
+
+    <!-- Email input -->
+    <div class="p-1 form-outline mb-4">
+      <input
+        type="text"
+        id="form6Example5"
+        name="regno"
+        class="form-control"
+        value="{{regno}}"
+      />
+      <label class="form-label" for="form6Example5">Registration No. </label>
     </div>
+    <input type="hidden" name="carID" id="carID" value="{{id}}" />
+    <!-- Text input -->
+    <div class="p-1 form-outline mb-4">
+      <input
+        type="text"
+        value="{{model}}"
+        name="model"
+        id="form6Example3"
+        class="form-control"
+      />
+      <label class="form-label" for="form6Example3">Model</label>
+    </div>
+
+    <!-- Text input -->
+    <div class="p-1 form-outline mb-4">
+      <input
+        type="text"
+        id="form6Example4"
+        value="{{make}}"
+        name="make"
+        class="form-control"
+      />
+      <label class="form-label" for="form6Example4">Make</label>
+    </div>
+
+    <!-- Number input -->
+    <div class="p-1 form-outline mb-4">
+      <input
+        type="tel"
+        id="form6Example6"
+        name="year"
+        value="{{year}}"
+        class="form-control"
+      />
+      <label class="form-label" for="form6Example6">Year</label>
+    </div>
+
+    <div class="form-check form-check-inline" style="margin-left: 10px;">
+      <input
+        class="form-check-input"
+        type="radio"
+        name="type"
+        id="type"
+        value="Economy"
+      />
+      <label class="form-check-label" for="inlineRadio1">Economy</label>
+    </div>
+
+    <div class="form-check form-check-inline" style="margin-left: 10px;">
+      <input
+        class="form-check-input"
+        type="radio"
+        name="type"
+        id="type"
+        value="Luxury"
+      />
+      <label class="form-check-label" for="inlineRadio2">Luxury</label>
+    </div>
+
+    <div class="form-check form-check-inline" style="margin-left: 10px;">
+      <input
+        class="form-check-input"
+        type="radio"
+        name="type"
+        id="type"
+        value="SUV"
+      />
+      <label class="form-check-label" for="inlineRadio3">SUV</label>
+    </div>
+
+    <!-- Text input -->
+    <div class="p-1 form-outline mb-4">
+      <input
+        type="text"
+        id="form6Example4"
+        value="{{location}}"
+        name="location"
+        class="form-control"
+      />
+      <label class="form-label" for="form6Example4">City</label>
+    </div>
+
+    <!-- Submit button -->
+    <button
+      type="submit"
+      class="p-1 btn btn-primary btn-block mb-4 ms-auto me-auto"
+      style="width:80px;margin-top:40px;"
+    ><i class="fas fa-arrow-right"></i></button>
+  </form>
 </div>
 <script type="text/javascript">
-function fetchLocation()
-{
-    var location=document.getElementById('location');
-    var Autocomplete = new google.maps.places.Autocomplete(location);
-}
-//Jquery
-$(document).ready(function(){
-    $('.upload-btn').on('click',function(){
-        $('#upload-ip').click();
-    });
-    $('#upload-ip').on('change',function(){
-        var uploadip = $('#upload-ip');
-        if(uploadip.val() != ''){
-            var formData = new FormData();
-            formData.append('image',uploadip[0].files[0]);
-
-            $.ajax({
-                url: '/uploadImage',
-                type: 'POST',
-                data : formData,
-                processData : false,
-                contentType: false,
-                success : function(){
-                    uploadip.val('');
-                }
-            })
-        }
-    })
-})
-window.onload = function(){
-    if(window.jQuery) {
-    }
-    else
-        alert('Jquery not loaded. Please reload the page');
-}
+  function fetchLocation() { var location=document.getElementById('location');
+  var Autocomplete = new google.maps.places.Autocomplete(location); }
 </script>
-<script 
-type="text/javascript" 
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRw7Pkib_l1vlyAZZ7-BKWiSie4wD1prk&libraries=places&callback=fetchLocation">
+<script
+  type="text/javascript"
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRw7Pkib_l1vlyAZZ7-BKWiSie4wD1prk&libraries=places&callback=fetchLocation"
+>
 </script>

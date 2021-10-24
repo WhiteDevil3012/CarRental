@@ -1,9 +1,60 @@
-h1 {
-    color: #008000;
-    text-align: center;
+.nav-item {
+  margin-left: 10px;
+  margin-right: 10px;
 }
-.w-100 {
-  width : 100% !important;
-  height : 37.25rem !important;
+#hometext {
+  margin-left: 5%;
+  margin-top: 40px;
 }
-  
+#hometext1 {
+  margin-left: 5%;
+  margin-top: 20px;
+}
+#ex1 {
+  margin-left: 45px;
+  margin-top: 30px;
+}
+li {
+  margin-left: 50px;
+}
+.form-outline {
+  margin-left: 10px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  margin-right: 10px;
+  height: 40px;
+  width: 500 px;
+}
+.form-outline .form-control ~ .form-notch .form-notch-leading {
+  border-top: 0.2rem solid #d8d8d8;
+  border-bottom: 0.2rem solid #d8d8d8;
+  border-left: 0.2rem solid #d8d8d8;
+}
+
+.form-outline .form-control ~ .form-notch .form-notch-trailing {
+  border-top: 0.2rem solid #d8d8d8;
+  border-right: 0.2rem solid #d8d8d8;
+  border-bottom: 0.2rem solid #d8d8d8;
+}
+
+.form-outline .form-control ~ .form-notch .form-notch-middle {
+  border-bottom: 0.2rem solid #d8d8d8;
+  border-top: 0.2rem solid #d8d8d8;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+}
+
+.allbutfooter {
+  min-height: calc(100vh - 120px);
+}
+
+footer {
+  margin-top: 9px;
+  height: 110px;
+}

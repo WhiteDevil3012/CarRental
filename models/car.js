@@ -26,7 +26,6 @@ const carSchema = new Schema({
     },
     isAvailable:{
         type: Boolean,
-        default:true,
     },
     rating:{
         type:Number,

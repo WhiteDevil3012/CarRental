@@ -46,6 +46,7 @@ const Book = require('./models/booking');
 const Pay = require('./models/payments');
 const Feedback = require('./models/feedback');
 const feedback = require('./models/feedback');
+const tariff = require('./models/tariff');
 //Connect
 mongoose.connect(keys.MongoDB,{
     useNewUrlParser: true, 
@@ -54,7 +55,7 @@ mongoose.connect(keys.MongoDB,{
     }).catch((err) =>{
         console.log(err);
 });
-const port = process.env.PORT||3000;
+const port = process.env.PORT||4000;
 var hbsHelpers = exphbs.create({
     helpers: require("./helpers/handlebars.js").helpers,
     defaultLayout: 'main',
@@ -73,7 +74,7 @@ app.set('view engine','handlebars');
 app.use(express.static('public'));
 app.get('/',ensureGuest,(req,res) => {
     res.render('home',{
-        title: 'RKK Vehicle Rentals'
+        title: 'Drip Wheels | Car Rental '
     });
 });
 app.get('/about',(req,res)=>{
@@ -108,7 +109,8 @@ app.post('/signup',ensureGuest,(req,res)=>{
         res.render('signup',{
             title:'Signup',
             errors:errors,
-            name:req.body.name,
+            firstname:req.body.firstname,
+            lastname:req.body.lastname,
             email:req.body.email,
             phone:req.body.phone,
             location:req.body.location,
@@ -127,12 +129,12 @@ app.post('/signup',ensureGuest,(req,res)=>{
                 //Encrypt Password
                 let salt = bcrypt.genSaltSync(10);
                 let hash = bcrypt.hashSync(req.body.password,salt);
-                let img="/image/defaultuser.png";
-                if(req.body.image!=="")
-                    img=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
-                
+                let img=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
+                if(req.body.image==="")
+                    img="/image/defaultuser.png";
                 const newUser = {
-                    name:req.body.name,
+                    firstname:req.body.firstname,
+                    lastname:req.body.lastname,
                     email:req.body.email,
                     phone:req.body.phone,
                     location:req.body.location,
@@ -149,8 +151,8 @@ app.post('/signup',ensureGuest,(req,res)=>{
                         console.log('New User is created');
                         success=[];
                         success.push({text:"You can log in now"});
-                        res.render('login',{
-                            title:'Login',
+                        res.render('signup',{
+                            title:'Signup',
                             success:success
                         });
                     }
@@ -174,10 +176,18 @@ app.get('/profile',requireLogin,(req,res) => {
                 throw err;
             }
             if(user){
-                res.render('profile',{
-                    title:'Profile',
-                    user:user,
-                });
+                Book.find({user:user._id})
+                .populate('car')
+                .sort({end:'desc'})
+                .then((books) => {
+                    //console.log(books); 
+                    res.render('profile',{
+                        title:'Profile',
+                        user:user,
+                        books:books,
+                    });
+                })
+                
             }
         })
     });
@@ -185,8 +195,8 @@ app.get('/profile',requireLogin,(req,res) => {
 app.get('/loginError',ensureGuest,(req,res) =>{
     let errors=[];
     errors.push({text:"Incorrect email or password"});
-    res.render('login',{
-        title:'Login',
+    res.render('signup',{
+        title:'Signup',
         errors:errors
     });
 });
@@ -215,73 +225,231 @@ app.get('/createA',requireLogin,checkM,(req,res) => {
         title:'Add admin',
     })
 });
+app.get('/deletec',requireLogin,checkM,(req,res) => {
+    Car.find()
+    .populate('tariff')
+    .then((cars) => {
+        res.render('showCars',{
+            cars:cars,
+            action:'delcar',
+            message:'Delete Car',
+        })
+    })
+})
+app.post('/delcar',requireLogin,checkM,(req,res) => {
+    console.log(req.body);
+    Car.findById({_id:req.body.cid})
+    .then((car) => {
+        Tariff.findByIdAndDelete({_id:car.tariff})
+        .then((err,del) =>{
+            if(err){
+                console.log(err);
+            }
+            if(del){
+                console.log("Deleted:",del);
+            }
+        })
+    });
+    Car.findByIdAndDelete({_id:req.body.cid})
+        .then((err,del) =>{
+            if(err){
+                console.log(err); 
+            }
+            if(del){
+                console.log("Deleted:",del);
+            }
+        });
+    res.redirect('/showCars');
+
+})
 app.post('/tariff',requireLogin,checkAdmin,(req,res) => {
-    const newCar = {
-        regno:req.body.regno,
-        model:req.body.model,
-        make:req.body.make,
-        year:req.body.year,
-        type:req.body.type,
-        location:req.body.location,
-    }
-    new Car(newCar).save((err,car) => {
-        if(err){
-            throw err;
+    console.log("In tariff");
+    console.log(req.body);
+    if(req.body.carID==='')
+    {
+        const newCar = {
+            regno:req.body.regno,
+            model:req.body.model,
+            make:req.body.make,
+            year:req.body.year,
+            type:req.body.type,
+            location:req.body.location,
         }
+        new Car(newCar).save((err,car) => {
+            if(err){
+                throw err;
+            }
+            if(car){
+                newCar._id = car._id,
+                res.render('tariff',{
+                    title:'Tariff',
+                    id: car._id,
+                })
+            }
+        })
+    }
+    else{
+        Car.findById({_id:req.body.carID})
+    .then((car) =>{
         if(car){
-            newCar._id = car._id,
-            res.render('tariff',{
-                title:'Tariff',
-                id: car._id,
-            })
+            car.regno=req.body.regno;
+        car.model=req.body.model;
+        car.make=req.body.make;
+        car.year=req.body.year;
+        car.type=req.body.type;
+        car.location=req.body.location;
+        car.save((err,car) => {
+            if(err){
+                throw err;
+            }
+            if(car){
+                res.render('tariff',{
+                    title:'Tariff',
+                    id: car._id,
+                })
+            }
+        })
         }
     })
+    }
+    
 });
+app.post('/backtolist',requireLogin,(req,res) => {
+    Car.findById({_id:req.body.carID})
+    .then((car) => {
+        res.render('listcar',{
+            title:'List Car',
+            id: car._id,
+            regno:car.regno,
+            model:car.model,
+            make:car.make,
+            year:car.year,
+            type:car.type,
+            location:car.location,
+        })
+    })
+})
 app.post('/dispcar',requireLogin,(req,res) => {
+    
     Car.findById({_id:req.body.cid})
     .populate('tariff')
     .then((car) => {
-        res.render('displaycar',{
-            Title: car.model,
-            car:car,
+        Feedback.find()
+        .populate('book')
+        .then((feedbacks) => {
+            avf=[];
+            for(let i=0;i<feedbacks.length;i++)
+            {
+                //console.log(feedbacks[i].book.car);
+                //console.log(car._id);
+                if(JSON.stringify(feedbacks[i].book.car) === JSON.stringify(car._id) )
+                {
+                    console.log("Push");
+                    avf.push(feedbacks[i]);
+                }
+            }
+            console.log(avf);
+            res.render('displaycar',{
+                Title: car.model,
+                car:car,
+                feedbacks: avf,
+            })
         })
     })
 })
 app.post('/image',requireLogin,checkAdmin,(req,res) => {
-    console.log(req.body);
-    const newTariff ={
-        bp: req.body.bp,
-        pph: req.body.pph,
-        ppd: req.body.ppd,
-        ppw: req.body.ppw,
-    };
-    new Tariff(newTariff).save((err,tariff) => {
-        if(err){
-            throw err;
-        }
-        if(tariff){
-            Car.findById({_id:req.body.carID})
-            .then((car) => {
-                car.tariff=tariff._id;
-                car.save((err,user) => {
-                    if(err){
-                        throw err;
-                    }
-                    if (car){
-                        res.render('image',{
-                            title:'Upload Image',
-                            cid:car._id,
+    if(req.body.tid==='')
+    {
+        const newTariff ={
+            bp: req.body.bp,
+            pph: req.body.pph,
+            ppd: req.body.ppd,
+            ppw: req.body.ppw,
+        };
+        new Tariff(newTariff).save((err,tariff) => {
+            if(err){
+                throw err;
+            }
+            if(tariff){
+                Car.findById({_id:req.body.carID})
+                .then((car) => {
+                    car.tariff=tariff._id;
+                    car.save((err,user) => {
+                        if(err){
+                            throw err;
+                        }
+                        if (car){
+                            res.render('image',{
+                                title:'Upload Image',
+                                cid:car._id,
+                                tid:tariff._id,
+                            });
+                        }
+                    });
+                });    
+            }
+        })
+    }
+    else{
+        Tariff.findById({_id:req.body.tid})
+    .then((tariff) => {
+        if(tariff)
+        {
+            tariff.bp= req.body.bp;
+            tariff.pph= req.body.pph;
+            tariff.ppd= req.body.ppd;
+            tariff.ppw= req.body.ppw;
+            tariff.save((err,tariff) => {
+                if(err){
+                    console.log(err);
+                }
+                if(tariff){
+                    Car.findById({_id:req.body.carID})
+                    .then((car) => {
+                        car.tariff=tariff._id;
+                        car.save((err,user) => {
+                            if(err){
+                                throw err;
+                            }
+                            if (car){
+                                res.render('image',{
+                                    title:'Upload Image',
+                                    cid:car._id,
+                                    tid:tariff._id,
+                                });
+                            }
                         });
-                    }
-                });
-            });    
+                    });    
+                }
+            })
         }
     })
+    
+    }
 });
+app.post('/backtotariff',requireLogin,checkAdmin,(req,res) => {
+    Tariff.findById({_id:req.body.tid})
+    .then((tariff) => {
+        if(tariff){
+            res.render('tariff',{
+                bp: req.body.bp,
+                pph: req.body.pph,
+                ppd: req.body.ppd,
+                ppw: req.body.ppw,
+                id:req.body.cid,
+                tid:req.body.tid, 
+            });
+        }
+    })
+})
 app.post('/uploadcar',requireLogin,checkAdmin,(req,res) => {
     Car.findById({_id:req.body.cid})
             .then((car) => {
+                console.log(req.body.image);
                 car.image=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
+                car.isAvailable=true;
+                if(req.body.image!=="")
+                    img="/image/defcar.webp";
                 car.save((err,user) => {
                     if(err){
                         throw err;
@@ -298,7 +466,9 @@ app.get('/showCars',requireLogin,(req,res) => {
     .sort({rating:'desc'})
     .then((cars) => {
         res.render('showCars', {
-            cars: cars
+            cars: cars,
+            action:'dispcar',
+            message:'Show Car',
         })
     })
     
@@ -318,11 +488,11 @@ app.post('/createA',requireLogin,checkM,(req,res)=>{
         res.render('addadmin',{
             title:'Add admin',
             errors:errors,
-            name:req.body.name,
+            firstname:req.body.firstname,
+            lastname:req.body.lastname,
             email:req.body.email,
             phone:req.body.phone,
             location:req.body.location,
-            drive:req.body.drive,
         });
     }else{
         User.findOne({email:req.body.email})
@@ -337,15 +507,15 @@ app.post('/createA',requireLogin,checkM,(req,res)=>{
                 //Encrypt Password
                 let salt = bcrypt.genSaltSync(10);
                 let hash = bcrypt.hashSync(req.body.password,salt);
-                let img="/image/defaultuser.png";
-                if(req.body.image!=="")
-                    img=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
+                let img=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
+                if(req.body.image==="")
+                    img="/image/defaultuser.png";
                 const newUser = {
-                    name:req.body.name,
+                    firstname:req.body.firstname,
+                    lastname:req.body.lastname,
                     email:req.body.email,
                     phone:req.body.phone,
                     location:req.body.location,
-                    drive:req.body.drive,
                     password: hash,
                     role: "Admin",
                     image: img,
@@ -368,9 +538,15 @@ app.post('/createA',requireLogin,checkM,(req,res)=>{
 });
 app.post('/rentcar',requireLogin,(req,res)=> {
     console.log(req.body);
+    let caravailable=true;
+    Car.findById({_id:req.body.cid})
+    .then((car) => {
+            caravailable=car.isAvailable;
+        }
+    )
     Book.findOne({user:req.body.uid,hasCompleted:false})
     .then((book)=> {
-        if(!book){
+        if(!book && caravailable){
             newBook={
                 user:req.body.uid,
                 car:req.body.cid,
@@ -389,9 +565,7 @@ app.post('/rentcar',requireLogin,(req,res)=> {
                                 throw err;
                             }
                             if (car){
-                                res.render('profile',{
-                                    title:'Profile',
-                                });
+                                res.redirect('/profile');
                             }
                         });
                     });
@@ -407,10 +581,28 @@ app.post('/rentcar',requireLogin,(req,res)=> {
                 errors:errors,
             });
         }
+        if(!caravailable){
+            console.log("Car is currently unavailable");
+            Car.find({isAvailable:true})
+            .populate('tariff')
+            .sort({rating:'desc'})
+            .then((cars) => {
+                res.render('showCars', {
+                    cars: cars,
+                    error:"Sorry the car has been booked just now by another user. check other cars",
+                })
+    })
+        }
     });
     
 });
+app.get('/ipcar',(req,res)=> {
+    res.render('image',{
+        title:'Upload Image',
+    });
+})
 app.post('/uploadImage',upload.any(),(req,res) => {
+    console.log("Input request arrived");
     const form = new formidable.IncomingForm();
     form.on('file',(field,file) => {
         console.log(file);
@@ -423,6 +615,7 @@ app.post('/uploadImage',upload.any(),(req,res) => {
     });
     form.parse(req);
 });
+/*
 app.post('/dispOrders',requireLogin,(req,res) => {
     Book.find({user:req.user._id})
     .populate('car')
@@ -434,6 +627,7 @@ app.post('/dispOrders',requireLogin,(req,res) => {
         })
     })
 });
+*/
 function msToTime(duration) {
     const msInWeek = 1000 * 60 * 60 * 24 *7;
     const weeks = Math.trunc(duration / msInWeek);
@@ -554,15 +748,14 @@ app.post('/pay',(req,res) =>{
     }).catch((err) => {console.log(err);})
 })
 app.post('/feedback',(req,res) => {
-    let img=''
-    if(req.body.image!=='')
-        img=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
+    
     newFeedback ={
         book:req.body.bid,
         rating: parseInt(req.body.rating),
         review: req.body.review,
-        image:img,
     };
+    if(req.body.image!=='')
+        newFeedback.image=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
     new Feedback(newFeedback).save((err,feed) =>{
         if(err){
             console.log(err);
@@ -599,10 +792,22 @@ app.post('/feedback',(req,res) => {
                                 console.log('Feedback stored');
                                 let success=[];
                                 success.push({text:"Booking complete. You can rent now"});
-                                res.render('profile',{
-                                    title:'Profile',
-                                    success:success,
-                                });
+                                Book.find({user:book.user})
+                                .populate('car')
+                                .sort({end:'desc'})
+                                .then((books) => {
+                                //console.log(books);
+                                User.findById({_id:book.user})
+                                .then((user)=>{
+                                    res.render('profile',{
+                                        title:'Profile',
+                                        user:user,
+                                        success:success,
+                                        books:books,
+                                    });
+                                }) 
+                                
+                })
                             }
                         })
                     }
@@ -630,6 +835,7 @@ app.get('/viewf',(req,res)=>{
 app.get('/viewo',(req,res)=>{
     Book.find()
     .populate('car')
+    .populate('user')
     .then((books) =>{
         res.render('listorders',{
             books:books,

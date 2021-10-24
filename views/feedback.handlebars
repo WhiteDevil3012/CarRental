@@ -1,44 +1,56 @@
-<style>
-  body {
-  background-color: #328f8a;
-  background-image: linear-gradient(45deg, #328f8a, #08ac4b);
-  font-family: "Roboto", sans-serif;
-}
-</style>
-<div class="body">
-<div class="login-page">
-      <div class="form">
-        <div class="login">
-          <div class="login-header">
-            <h3>Feedback</h3>
-            <p>How was your experience</p>
-          </div>
+<div
+  class="d-flex shadow-4 flex-wrap"
+  style="background-color:white;margin-top:30px;margin-bottom:100px;margin-left:3%;margin-right:3%;"
+>
+    
+  <form
+    class="d-flex ms-auto me-auto flex-column"
+    style="width:50%;min-width:300px;margin-top:50px;"
+    action="/feedback"
+    method="POST"
+  >
+  <h3>Feedback</h3>
+  <h4>How was your experience?</h4>
+  <input type="hidden" name="bid" value="{{bid}}"/>
+        <label class="form-label" for="rating">Rating</label>
+        <div class="range">
+          <input type="range" min="1" max="5" step="1" class="form-range" id="rating" name="rating" />
         </div>
-        <form class="login-form" method="POST" action="/feedback">
-            <input type="hidden" name="bid" value="{{bid}}"/>
-            <select name="rating" id="rating">
-                <option value="5">5</option>
-                <option value="4">4</option>
-                <option value="3">3</option>
-                <option value="2">2</option>
-                <option value="1">1</option>
-            </select>
-            <textarea id="review" name="review" rows="4" cols="50" placeholder="Enter your feedback"></textarea>
-            <input type="file" name="image" id="upload-ip" style="display:none"/>
-            <buttom class="btn btn-info upload-btn" type="button">Choose an image</buttom>
-            <button>Post Feedback</button>
-        </form>
+
+        <!-- Message input -->
+      <div class="form-outline mb-4" style="margin-left:10px;margin-right:10px;height: 115px;">
+        <textarea class="form-control" name="review" id="form4Example3" rows="4" ></textarea>
+        <label class="form-label" for="form4Example3">Review</label> 
       </div>
+        <label
+      class="form-label"
+      for="customFile"
+      style="margin-left:10px"
+    >Image</label>
+    <input
+      type="file"
+      class="form-control"
+      id="customFile"
+      name="image"
+      value="{{image}}"
+      style="width:50%;margin-left:10px;margin-right:10px;min-width:210px;"
+    /> 
+        <button
+          type="submit"
+          class="btn btn-primary btn me-auto ms-auto"
+          style="margin-top: 20px;width:100px;margin-bottom:60px;"
+        >Submit</button>
+      </form>
     </div>
+  </div>
+
 </div>
 <script type="text/javascript">
 //Jquery
 $(document).ready(function(){
-    $('.upload-btn').on('click',function(){
-        $('#upload-ip').click();
-    });
-    $('#upload-ip').on('change',function(){
-        var uploadip = $('#upload-ip');
+    
+    $('#customFile').on('change',function(){
+        var uploadip = $('#customFile');
         if(uploadip.val() != ''){
             var formData = new FormData();
             formData.append('image',uploadip[0].files[0]);

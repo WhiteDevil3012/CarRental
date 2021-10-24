@@ -1,19 +1,54 @@
-{{#each cars}}
-<img src="{{image}}" width="300px">
-<p>Rating:{{rating}}</p>
-<p>Car Make:{{make}}</p>
-<p>Car Model:{{model}}</p>
-<p>Manufacture Year:{{year}}</p>
-<p>Car Type:{{type}}</p>
-<p>Location:{{location}}</p>
-<p>Tariff:</p>
-<p>Base Price:{{tariff.bp}}</p>
-<p>Price per hour:{{tariff.pph}}</p>
-<p>Price per day:{{tariff.ppd}}</p>
-<form action='/dispcar' method="POST">
-    <input type="hidden" name="cid" value="{{_id}}"/>
-    <button>Display Car</button>
-</form>
-{{else}}
-<p> No cars found</p>
-{{/each}}
+{{#if error}}
+<div class="alert alert-danger alert-dismissible fade show">
+        <span type="button" class="close" data-mdb-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>{{error}}
+      </div>
+{{/if}}
+<div
+  class="d-flex shadow-4 flex-wrap"
+  style="background-color:white;margin-top:30px;margin-bottom:100px;min-width:100%;"
+>
+
+  {{#each cars}}
+
+    <div
+      class="p-2 card hover-shadow"
+      style="min-height: 25px;min-width:300px;width:30%;margin:20px;"
+    >
+      <img
+        src="{{image}}"
+        class="card-img-top ms-auto me-auto"
+        alt="..." style="min-height: 250px;min-width:300px;"
+      />
+      <div class="card-body" style="min-width: 250px;">
+        <h5 class="card-title">{{make}} {{model}}</h5>
+        <p class="card-text">
+          <p>Rating: {{rating}}</p>
+          <p>Manufacture Year: {{year}}</p>
+          <p>Car Type: {{type}}</p>
+          <p>Location: {{location}}</p>
+        </p>
+
+        <ul
+          class="list-group list-group-flush ms-auto me-auto"
+          style="min-width: 200px;"
+        >
+          <li class="list-group-item" style="margin-left: 0px;">Base Price:{{tariff.bp}}</li>
+          <li class="list-group-item" style="margin-left: 0px;">Price per hour:{{tariff.pph}}</li>
+          <li class="list-group-item" style="margin-left: 0px;">Price per day:{{tariff.ppd}}</li>
+        </ul>
+
+        <form action="/{{../action}}" method="POST" style="margin-top: 20px;">
+          <input type="hidden" name="cid" value="{{_id}}">
+          <button
+            type="submit"
+            class="btn btn-primary btn"
+            style=""
+          >{{../message}}</button>
+        </form>
+      </div>
+    </div>
+  {{else}}
+    <p> No cars found</p>
+  {{/each}}
+
+</div>

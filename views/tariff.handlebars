@@ -1,32 +1,94 @@
-<style>
-  body {
-  background-color: #328f8a;
-  background-image: linear-gradient(45deg, #328f8a, #08ac4b);
-  font-family: "Roboto", sans-serif;
-}
-</style>
-<div class="body">
-    
-<div class="login-page">  
-    {{#each errors}}
-    <div class="alert alert-danger">
-        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>{{text}}
-    </div>
-    {{/each}}
-      <div class="form">
-        <div class="login">
-          <div class="login-header">
-            <h3>Enter Tariff for car</h3>
-          </div>
-        </div>
-        <form class="login-form" method="POST" action="/image">
-            <input type="hidden" name="carID" id="carID" value="{{id}}" />
-            <input type="number" name="bp" id="bp" placeholder="Base Price" value="{{bp}}"/>
-            <input type="number" name="pph" id="pph" placeholder="Price per hour" value="{{pph}}"/>
-          <input type="number" name="ppd" id="ppd" placeholder="Price per day" value="{{ppd}}"/>
-          <input type="number" name="ppw" id="ppw" placeholder="Price per week" value="{{ppw}}"/>
-          <button>Submit</button>
+<form
+          class="d-flex ms-auto me-auto flex-column"
+          style="width:50%;min-width:300px;0%;margin-top:50px;"
+          action="/backtolist"
+          method="POST"
+        >
+        <input type="hidden" name="carID" id="carID" value="{{id}}" />
+<button
+            type="submit"
+            class="btn btn-primary btn me-auto ms-auto"
+            style="margin-top: 20px;width:100px;margin-bottom:60px;"
+          ><i class="fas fa-arrow-left"></i></button>
         </form>
+<div
+  class="container shadow-4"
+  style="background-color: white;margin-bottom:100px;"
+>
+  <div class="d-flex" style="margin-top: 50px;justify-content: center;"><h3
+      style="margin-top: 30px;"
+    >Enter Tariff for car</h3></div>
+  <form
+    action="/image"
+    method="post"
+    class="d-flex flex-column me-auto ms-auto"
+    style="width:60%;min-width:300px;margin-top:50px;"
+  >
+    <!--each method for each errors-->
+    {{#each errors}}
+      <div class="alert alert-danger">
+        <a
+          href="#"
+          class="close"
+          data-dismiss="alert"
+          aria-label="close"
+        >&times;</a>{{text}}
       </div>
+    {{/each}}
+    <input type="hidden" name="carID" id="carID" value="{{id}}" />
+    <input type="hidden" name="tid" id="tid" value="{{tid}}" />
+    <!-- Email input -->
+    <div class="p-1 form-outline mb-4">
+      <input
+        type="number"
+        id="bp"
+        name="bp"
+        class="form-control"
+        value="{{bp}}"
+      />
+      <label class="form-label" for="form6Example5">Base Price</label>
     </div>
+
+    <!-- Text input -->
+    <div class="p-1 form-outline mb-4">
+      <input
+        type="number"
+        value="{{pph}}"
+        name="pph"
+        id="pph"
+        class="form-control"
+      />
+      <label class="form-label" for="form6Example3">Price per hour</label>
+    </div>
+
+    <!-- Text input -->
+    <div class="p-1 form-outline mb-4">
+      <input
+        type="number"
+        id="ppd"
+        value="{{ppd}}"
+        name="ppd"
+        class="form-control"
+      />
+      <label class="form-label" for="form6Example4">Price per day</label>
+    </div>
+
+    <!-- Number input -->
+    <div class="p-1 form-outline mb-4">
+      <input
+        type="number"
+        id="ppw"
+        name="ppw"
+        value="{{ppw}}"
+        class="form-control"
+      />
+      <label class="form-label" for="form6Example6">Price per week</label>
+    </div>
+    <!-- Submit button -->
+    <button
+      type="submit"
+      class="p-1 btn btn-primary btn-block mb-4 ms-auto me-auto"
+      style="width:80px;margin-top:40px;"
+    ><i class="fas fa-arrow-right"></i></button>
+  </form>
 </div>

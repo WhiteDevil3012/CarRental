@@ -15,7 +15,6 @@ const feedbackSchema = new Schema({
     },
     image:{
         type: String,
-        default:'',
     },
     
 });

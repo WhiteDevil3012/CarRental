@@ -1,0 +1,65 @@
+<div
+  class="d-flex shadow-4 flex-wrap"
+  style="background-color:white;margin-top:30px;margin-bottom:100px;margin-left:3%;margin-right:3%;"
+>
+  
+  {{#each books}}
+  <div class="d-flex flex-row mb-3 flex-wrap shadow-4" style="margin-top:3%;"></div>
+    <div
+      class="p-2 shadow-4 flex-fill"
+      style="background-color:white;width:400px;"
+    >
+    <h3 style="margin-top: 30px;margin-left:20px;">{{car.make}}
+        {{car.model}}</h3>
+        <ul class="list-group-flush" style="margin-left:20px;width:300px;">
+            <li class="list-group-item" style="margin-left:0px;">Booking ID:{{_id}}</li>
+            <li class="list-group-item" style="margin-left:0px;">Car Type:{{car.type}}</li>
+            <li class="list-group-item" style="margin-left:0px;">Start Date:{{start}}</li>
+            {{#if hasCompleted}}
+            <li class="list-group-item" style="margin-left:0px;">Ending Date:{{end}}</li>
+            {{else}}
+          </ul>
+    <ul class="list-group-flush" style="margin-left:20px;width:400px;"></ul>
+    <p></p>
+    <p></p>
+    <p></p>
+    
+      <p></p>
+    
+      {{#if end}}
+        <form action="/makePayment" method="GET">
+          <input type="hidden" name="bid" value="{{_id}}" />
+          <button
+            type="submit"
+            class="btn btn-primary btn"
+            style="margin-left: 50px;"
+          >Pay Now</button>
+        </form>
+      {{else}}
+        <form action="/return" method="POST">
+          <input type="hidden" name="bid" value="{{_id}}" />
+          <button
+            type="submit"
+            class="btn btn-primary btn"
+            style="margin-left: 50px;"
+          >Return Car</button>
+        </form>
+      {{/if}}
+    {{/if}}
+    </div>
+    
+    
+    
+    <div
+      class="p-2 d-flex shadow-4 flex-fill bg-image hover-zoom"
+      style="background-color: white;width:500px;min-width:50%;"
+    >
+      <img class="img-fluid ms-auto me-auto" src="{{car.image}}" />
+    </div>
+
+  {{else}}
+    <h3 style="margin-top:30px;margin-left:30px;"> No orders done</h3>
+  </div>
+  {{/each}}
+</div>
+</div>
