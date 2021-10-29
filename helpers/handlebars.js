@@ -24,6 +24,14 @@ var register = function(Handlebars) {
         }
         return false;
     },
+    hasR: function(rating, options) {
+        if(rating !== undefined)
+        {
+            //console.log(user);
+            if(rating > 0 ) return true;
+        }
+        return false;
+    },
     
 };
 

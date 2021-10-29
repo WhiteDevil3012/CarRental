@@ -103,6 +103,15 @@ app.post('/signup',ensureGuest,(req,res)=>{
     if(req.body.password.length < 6 ) {
         errors.push({text: 'Password must be atleast 6 characters!'});
     }
+    var regex=/^[789][0-9]{9}$/;
+    if(!regex.test(req.body.phone)){
+        errors.push({text: 'Enter valid phone number'});
+    }
+    var r2=/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(!r2.test(req.body.email)){
+        errors.push({text: 'Enter valid email'});
+    }
+    
     console.log(errors);
     if(errors.length > 0)
     {
@@ -474,7 +483,7 @@ app.get('/showCars',requireLogin,(req,res) => {
     
 } );
 app.post('/createA',requireLogin,checkM,(req,res)=>{
-    console.log(req.body);
+    //console.log(req.body);
     let errors=[];
     if(req.body.password !== req.body.password2) {
         errors.push({text: 'Passwords do not match!'});
@@ -482,6 +491,15 @@ app.post('/createA',requireLogin,checkM,(req,res)=>{
     if(req.body.password.length < 6 ) {
         errors.push({text: 'Password must be atleast 6 characters!'});
     }
+    var regex=/^[789][0-9]{9}$/;
+    if(!regex.test(req.body.phone)){
+        errors.push({text: 'Enter valid phone number'});
+    }
+    var r2=/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(!r2.test(req.body.email)){
+        errors.push({text: 'Enter valid email'});
+    }
+    
     console.log(errors);
     if(errors.length > 0)
     {
@@ -843,6 +861,141 @@ app.get('/viewo',(req,res)=>{
         })
     })
 })
+app.get('/myprofile',requireLogin,(req,res) => {
+    User.findById({_id:req.user._id})
+    .then((user) => {
+        res.render('dispprofile',{
+            user:user,
+            title:"My Profile"
+        })
+    })
+})
+app.get('/updatedetails',requireLogin,(req,res) => {
+    User.findById({_id:req.user._id})
+    .then((user) => {
+        res.render('udet',{
+            user:user,
+            title:"Update Details"
+        })
+    })
+})
+app.post('/updated',requireLogin,(req,res) => {
+    let errors=[];
+    var user1;
+    var img=req.body.image;
+    User.findById({_id:req.user._id})
+    .then((user) => {
+        if(user){
+            bcrypt.compare(req.body.password,user.password,(err,isMatch) => {
+                if (err){
+                    console.log(err);
+                }
+                if (isMatch){
+                    console.log("Password Match");
+                }
+                else {
+                    errors.push({text: 'Enter correct password'});
+                }
+        })
+        if(img==='')
+        {
+            img=req.user.image;
+            console.log("if");
+            console.log(img);
+        } 
+            
+        else
+            {
+                img=`https://vrentalapp.s3.ap-south-1.amazonaws.com/${req.body.image}`;
+                console.log(img);
+                console.log("else");
+            }
+        }
+        var regex=/^[789][0-9]{9}$/;
+    if(!regex.test(req.body.phone)){
+        errors.push({text: 'Enter valid phone number'});
+    }
+    var r2=/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(!r2.test(req.body.email)){
+        errors.push({text: 'Enter valid email'});
+    }
+    if(errors.length > 0)
+    {
+        res.render('udet',{
+            title:'udet',
+            errors:errors,
+            user:user1,
+        });
+    }else{
+        user.firstname=req.body.firstname;
+            user.lastname=req.body.lastname;
+            user.email=req.body.email;
+            user.phone=req.body.phone;
+            user.image=img;
+            user.location=req.body.location;
+            user.save((err,user) => {
+                if(err){
+                    console.log(err);
+                }
+                if(user){
+                    res.redirect('/myprofile');
+                }
+            });
+    }
+    });
+})
+app.get('/changepassword',requireLogin,(req,res) => {
+    res.render('changep',{
+        title:'Change Password',
+    })
+})
+app.post('/updatep',requireLogin,(req,res) => {
+    let errors=[];
+    User.findById({_id:req.user._id})
+    .then((user) => {
+        if(user){
+            bcrypt.compare(req.body.opassword,user.password,(err,isMatch) => {
+                if (err){
+                    console.log(err);
+                }
+                if (isMatch){
+                    console.log("Password Match");
+                }
+                else {
+                    errors.push({text: 'Enter correct password'});
+                }
+        });
+        if(req.body.password !== req.body.password2) {
+            errors.push({text: 'Passwords do not match!'});
+        }
+        if(req.body.password.length < 6 ) {
+            errors.push({text: 'Password must be atleast 6 characters!'});
+        }
+        if(errors.length > 0)
+    {
+        console.log(errors); 
+        res.render('changep',{
+            title:'Change Password',
+            errors:errors,
+            user:req.user,
+        });
+    }else{
+        let salt = bcrypt.genSaltSync(10);
+        let hash = bcrypt.hashSync(req.body.password,salt);
+        user.password=hash;
+            user.save((err,user) => {
+                if(err){
+                    console.log(err);
+                }
+                if(user){
+                    console.log("Password changed");
+                    res.redirect('/myprofile');
+                }
+            });
+    }
+    }
+    });
+});
 
 app.listen(port,() => {
     console.log('Server is on port:' + port);

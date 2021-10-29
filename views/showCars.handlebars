@@ -22,7 +22,9 @@
       <div class="card-body" style="min-width: 250px;">
         <h5 class="card-title">{{make}} {{model}}</h5>
         <p class="card-text">
+          {{#if (hasR rating)}}
           <p>Rating: {{rating}}</p>
+          {{/if}}
           <p>Manufacture Year: {{year}}</p>
           <p>Car Type: {{type}}</p>
           <p>Location: {{location}}</p>
